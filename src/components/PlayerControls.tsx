@@ -2,6 +2,7 @@ import React from "react";
 import PlayerButton from "./PlayerButton";
 import ProgressBar from "./ProgressBar";
 import VolumeControl from "./VolumeControl";
+import SettingsMenu from "./SettingsMenu";
 import { cn } from "@/lib/utils";
 
 interface PlayerControlsProps {
@@ -16,6 +17,8 @@ interface PlayerControlsProps {
   onToggleMute: () => void;
   isFullscreen: boolean;
   onToggleFullscreen: () => void;
+  playbackRate: number;
+  onPlaybackRateChange: (rate: number) => void;
   className?: string;
 }
 
@@ -31,6 +34,8 @@ const PlayerControls: React.FC<PlayerControlsProps> = ({
   onToggleMute,
   isFullscreen,
   onToggleFullscreen,
+  playbackRate,
+  onPlaybackRateChange,
   className,
 }) => {
   return (
@@ -77,7 +82,10 @@ const PlayerControls: React.FC<PlayerControlsProps> = ({
         </div>
 
         <div className="flex items-center space-x-2">
-          <PlayerButton icon="Settings" onClick={() => {}} size={20} />
+          <SettingsMenu
+            playbackRate={playbackRate}
+            onPlaybackRateChange={onPlaybackRateChange}
+          />
 
           <PlayerButton
             icon={isFullscreen ? "Minimize" : "Maximize"}

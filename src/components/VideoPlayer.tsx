@@ -13,6 +13,7 @@ const VideoPlayer: React.FC = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
+  const [playbackRate, setPlaybackRate] = useState(1);
 
   // Sample video URL (you can replace with actual video)
   const videoUrl =
@@ -33,6 +34,48 @@ const VideoPlayer: React.FC = () => {
       video.removeEventListener("loadedmetadata", updateDuration);
     };
   }, []);
+
+  // Keyboard controls
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      const video = videoRef.current;
+      if (!video) return;
+
+      switch (e.code) {
+        case "Space":
+          e.preventDefault();
+          handlePlayPause();
+          break;
+        case "ArrowLeft":
+          e.preventDefault();
+          handleSeek(Math.max(0, currentTime - 5));
+          break;
+        case "ArrowRight":
+          e.preventDefault();
+          handleSeek(Math.min(duration, currentTime + 5));
+          break;
+        case "ArrowUp":
+          e.preventDefault();
+          handleVolumeChange(Math.min(100, volume + 5));
+          break;
+        case "ArrowDown":
+          e.preventDefault();
+          handleVolumeChange(Math.max(0, volume - 5));
+          break;
+        case "KeyM":
+          e.preventDefault();
+          handleToggleMute();
+          break;
+        case "KeyF":
+          e.preventDefault();
+          handleToggleFullscreen();
+          break;
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
+  }, [currentTime, duration, volume, isPlaying]);
 
   const handlePlayPause = () => {
     const video = videoRef.current;
@@ -86,6 +129,14 @@ const VideoPlayer: React.FC = () => {
     setIsFullscreen(!isFullscreen);
   };
 
+  const handlePlaybackRateChange = (rate: number) => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    setPlaybackRate(rate);
+    video.playbackRate = rate;
+  };
+
   return (
     <div className="max-w-4xl mx-auto bg-black rounded-lg overflow-hidden shadow-2xl">
       <div
@@ -114,6 +165,8 @@ const VideoPlayer: React.FC = () => {
           onToggleMute={handleToggleMute}
           isFullscreen={isFullscreen}
           onToggleFullscreen={handleToggleFullscreen}
+          playbackRate={playbackRate}
+          onPlaybackRateChange={handlePlaybackRateChange}
           className={cn(
             "transition-opacity duration-300",
             showControls ? "opacity-100" : "opacity-0",
